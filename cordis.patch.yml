@@ -1,0 +1,5 @@
+# dsh-model-manager bundle patch — 挂载 Host 半身，注册 list_models 工具。
+- insert:
+    - id: dsh-model-manager
+      name: 'dsh-model-manager'
+      config: {}

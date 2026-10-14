@@ -1,0 +1,53 @@
+{
+  "name": "dsh-model-manager",
+  "version": "0.3.3",
+  "private": true,
+  "type": "module",
+  "description": "统一管理 DSH 里的所有模型：设置页「模型开关」列出全部 provider 与模型（含插件动态注册的，内置 Models 页看不见的那批），支持逐模型与整组开关；关闭后模型会从所有模型选择器中消失。另提供 list_models 工具做只读查看。",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "model-manager",
+    "llm-provider",
+    "model-visibility"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
+    }
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-llm": ">=0.1.0-rc.6 <0.3.0-0",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.6 <0.3.0-0",
+    "@deepseek-ai/dsh-client-runtime": ">=0.1.0-rc.6 <0.3.0-0",
+    "@deepseek-ai/dsh-client-locale": ">=0.1.0-rc.6 <0.3.0-0",
+    "@deepseek-ai/dsh-client-ui-settings": ">=0.1.0-rc.6 <0.3.0-0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-client-runtime": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-locale": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-settings": {
+      "optional": true
+    }
+  }
+}
