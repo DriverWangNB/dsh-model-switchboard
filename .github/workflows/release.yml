@@ -79,4 +79,4 @@ jobs:
       # 不要设置 NODE_AUTH_TOKEN：npm 检测到 Actions 的 OIDC 环境后自动走 trusted publishing，
       # 并自动附带 provenance（无需 --provenance）。
       - name: Publish
-        run: npm publish
+        run: npm publish --loglevel verbose
