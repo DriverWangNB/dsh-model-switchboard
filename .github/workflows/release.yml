@@ -59,24 +59,7 @@ jobs:
       - name: Offline regression tests
         run: node --test host.test.mjs
 
-      # 临时诊断：确认 OIDC 环境变量是否存在、runner 上有没有残留的 .npmrc 令牌遮蔽 OIDC
-      - name: Diagnose OIDC environment
-        run: |
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL set: $([ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] && echo yes || echo no)"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN set: $([ -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ] && echo yes || echo no)"
-          echo "--- npm config list ---"
-          npm config list
-          echo "--- npmrc 文件 ---"
-          for f in "$HOME/.npmrc" "$(pwd)/.npmrc"; do
-            if [ -f "$f" ]; then
-              echo "== $f =="
-              sed -E 's/(_authToken[[:space:]]*=).*/\1 ***/' "$f"
-            else
-              echo "== $f == 不存在"
-            fi
-          done
-
       # 不要设置 NODE_AUTH_TOKEN：npm 检测到 Actions 的 OIDC 环境后自动走 trusted publishing，
       # 并自动附带 provenance（无需 --provenance）。
       - name: Publish
-        run: npm publish --loglevel verbose
+        run: npm publish
