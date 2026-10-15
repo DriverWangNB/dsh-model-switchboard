@@ -25,7 +25,7 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 
 ```json
 "dependencies": {
-  "dsh-model-switchboard": "github:DriverWangNB/dsh-model-manager"
+  "dsh-model-switchboard": "github:DriverWangNB/dsh-model-switchboard"
 }
 ```
 
@@ -37,7 +37,7 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 }
 ```
 
-依赖的**键**必须是包名 `dsh-model-switchboard`；仓库叫什么名字不影响（仓库仍是 `dsh-model-manager`），pnpm 认的是仓库里 `package.json` 的 `name`。
+依赖的**键**必须是包名 `dsh-model-switchboard`，仓库名与包名一致；pnpm 认的是仓库里 `package.json` 的 `name`。
 
 再把包名登记进 `dsh.profile.bundles`：
 

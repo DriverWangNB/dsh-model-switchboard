@@ -3,7 +3,7 @@
 # 前置条件（在 npm 网站配置一次，只需一次）：
 #   npmjs.com → 你的包 → Settings → Trusted Publisher → GitHub Actions
 #     Organization or user : DriverWangNB
-#     Repository           : dsh-model-manager
+#     Repository           : dsh-model-switchboard
 #     Workflow filename    : release.yml
 #     Environment name     : 留空
 #

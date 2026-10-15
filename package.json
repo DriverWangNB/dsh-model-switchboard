@@ -37,6 +37,14 @@
     }
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DriverWangNB/dsh-model-switchboard.git"
+  },
+  "homepage": "https://github.com/DriverWangNB/dsh-model-switchboard#readme",
+  "bugs": {
+    "url": "https://github.com/DriverWangNB/dsh-model-switchboard/issues"
+  },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.2",
     "@deepseek-ai/dsh-llm": ">=0.1.0-rc.6 <0.3.0-0",
