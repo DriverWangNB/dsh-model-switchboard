@@ -4,6 +4,13 @@
   "type": "module",
   "description": "统一管理 DSH 里的所有模型：设置页「模型开关」列出全部 provider 与模型（含插件动态注册的，内置 Models 页看不见的那批），支持逐模型与整组开关；关闭后模型会从所有模型选择器中消失。另提供 list_models 工具做只读查看。",
   "main": "./index.js",
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
