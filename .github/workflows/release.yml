@@ -1,0 +1,65 @@
+# 通过 npm trusted publishing（OIDC）发布：不需要长期令牌，也不需要 OTP。
+#
+# 前置条件（在 npm 网站配置一次，只需一次）：
+#   npmjs.com → 你的包 → Settings → Trusted Publisher → GitHub Actions
+#     Organization or user : DriverWangNB
+#     Repository           : dsh-model-manager
+#     Workflow filename    : release.yml
+#     Environment name     : 留空
+#
+# 注意：本文件里不要给 actions/setup-node 传 registry-url。
+# 它会在 runner 上写一个空的 //registry.npmjs.org/:_authToken=，
+# npm 因此改用这个空令牌而不是 OIDC，发布会在签名 provenance 之后以 404 失败。
+
+name: Release to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+  # 允许在 Actions 页面手动触发，用于补发或首次发布
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # trusted publishing 必需：用于向 npm 换取短期 OIDC 凭证
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Node 22 自带 npm 10.x，低于 trusted publishing 要求的 11.5.1
+      - name: Ensure npm >= 11.5.1
+        run: |
+          npm install -g npm@latest
+          npm --version
+
+      # 推 tag 时校验 tag 与 package.json 的 version 一致，避免发错版本号
+      - name: Check tag matches package version
+        if: github.event_name == 'push'
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p "require('./package.json').version")
+          echo "tag=$TAG package.json=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::tag ($TAG) 与 package.json version ($PKG) 不一致"
+            exit 1
+          fi
+
+      - name: Offline regression tests
+        run: node --test host.test.mjs
+
+      # 不要设置 NODE_AUTH_TOKEN：npm 检测到 Actions 的 OIDC 环境后自动走 trusted publishing，
+      # 并自动附带 provenance（无需 --provenance）。
+      - name: Publish
+        run: npm publish
