@@ -19,6 +19,14 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 
 ```json
 "dependencies": {
+  "dsh-model-manager": "git+https://github.com/DriverWangNB/dsh-model-manager.git"
+}
+```
+
+国内网络如果拉 GitHub 不稳，换成 Gitee 镜像（内容同步，同一个包）：
+
+```json
+"dependencies": {
   "dsh-model-manager": "git+https://gitee.com/link77/dsh-models-manager.git"
 }
 ```
