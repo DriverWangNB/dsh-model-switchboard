@@ -1,5 +1,5 @@
 /**
- * dsh-model-manager Host 半身离线测试。
+ * dsh-model-switchboard Host 半身离线测试。
  * 用隔离的 DSH_HOME，避免污染真实开关状态。
  */
 import fs from 'node:fs'
@@ -10,12 +10,10 @@ const tmp = fs.mkdtempSync(path.join(process.cwd(), '.dmm-test-'))
 process.env.DSH_HOME = tmp
 
 import { pathToFileURL } from 'node:url'
-const mod = await import(
-  pathToFileURL('C:/Users/Link/.dsh/profiles/desktop/node_modules/dsh-model-manager/index.js').href
-)
+const mod = await import(pathToFileURL(path.join(import.meta.dirname, 'index.js')).href)
 
-const WRAPPED = Symbol.for('dsh-model-manager.wrapped')
-const RAW_ADAPTER = Symbol.for('dsh-model-manager.raw')
+const WRAPPED = Symbol.for('dsh-model-switchboard.wrapped')
+const RAW_ADAPTER = Symbol.for('dsh-model-switchboard.raw')
 
 // ── mock 环境 ────────────────────────────────────────────────────────────
 
@@ -189,14 +187,14 @@ check('channel-pack 渠道不递归（3 个模型）', lobster.length === 3, lob
 check('原 adapter 直接调用仍正常', (await adapters.get('lobsterai').adapter[RAW_ADAPTER].listModels('lobsterai')).length === 3)
 
 console.log('\n== /state 应该看到未过滤的全量目录 ==')
-let st = await call('GET', '/api/dsh-model-manager/state')
+let st = await call('GET', '/api/dsh-model-switchboard/state')
 check('HTTP 200', st.code === 200, st.code)
 check('三个 provider', st.json.providers.length === 3, st.json.providers.map((p) => p.id))
 check('模型总数 8', st.json.stats.models === 8, st.json.stats)
 check('初始无隐藏', st.json.stats.hiddenModels === 0 && st.json.stats.hiddenProviders === 0, st.json.stats)
 
 console.log('\n== 关闭单个模型 ==')
-let r = await call('POST', '/api/dsh-model-manager/toggle', { provider: 'our-free-model', model: 'openrouter/free' })
+let r = await call('POST', '/api/dsh-model-switchboard/toggle', { provider: 'our-free-model', model: 'openrouter/free' })
 check('toggle 200', r.code === 200, r.code)
 ofm = await llm.listModels('our-free-model')
 check('该模型已从运行时目录消失', !ofm.some((m) => m.id === 'openrouter/free'), ofm.map((m) => m.id))
@@ -205,21 +203,21 @@ check('buddy 未受影响', (await llm.listModels('buddy')).length === 2)
 check('切换后广播了 llm/adapters-updated', emitLog.length === 1, emitLog)
 
 console.log('\n== 面板仍能看到被关闭的模型 ==')
-st = await call('GET', '/api/dsh-model-manager/state')
+st = await call('GET', '/api/dsh-model-switchboard/state')
 const ofmPanel = st.json.providers.find((p) => p.id === 'our-free-model')
 check('面板显示全部 3 个', ofmPanel.models.length === 3, ofmPanel.models.map((m) => m.id))
 check('被关闭项标记 disabled', ofmPanel.models.find((m) => m.id === 'openrouter/free').disabled === true)
 check('统计隐藏 1 个模型', st.json.stats.hiddenModels === 1, st.json.stats)
 
 console.log('\n== 整组关闭 provider ==')
-r = await call('POST', '/api/dsh-model-manager/toggle', { provider: 'buddy' })
+r = await call('POST', '/api/dsh-model-switchboard/toggle', { provider: 'buddy' })
 check('toggle 200', r.code === 200, r.code)
 check('buddy 目录已清空', (await llm.listModels('buddy')).length === 0)
 check('our-free-model 不受影响', (await llm.listModels('our-free-model')).length === 2)
 check('整组关闭也广播', emitLog.length === 2, emitLog)
 
 console.log('\n== 持久化 ==')
-const statePath = path.join(tmp, 'dsh-model-manager', 'disabled.json')
+const statePath = path.join(tmp, 'dsh-model-switchboard', 'disabled.json')
 check('状态文件已写入', fs.existsSync(statePath))
 const saved = JSON.parse(fs.readFileSync(statePath, 'utf8'))
 check('providers 含 buddy', saved.providers.includes('buddy'), saved)
@@ -251,21 +249,21 @@ const ofm2 = await llm2.listModels('our-free-model')
 check('重启后单模型开关仍生效', ofm2.map((m) => m.id).join(',') === 'x', ofm2.map((m) => m.id))
 
 console.log('\n== 全部恢复 ==')
-r = await call('POST', '/api/dsh-model-manager/reset')
+r = await call('POST', '/api/dsh-model-switchboard/reset')
 check('reset 200', r.code === 200, r.code)
 check('统计归零', r.json.stats.hiddenModels === 0 && r.json.stats.hiddenProviders === 0, r.json.stats)
 check('buddy 恢复', (await llm2.listModels('buddy')).length === 1)
 check('reset 也广播', emitLog.length === 3, emitLog)
 
 console.log('\n== 组 / 组员联动 ==')
-let g = await call('POST', '/api/dsh-model-manager/toggle', { provider: 'our-free-model' })
+let g = await call('POST', '/api/dsh-model-switchboard/toggle', { provider: 'our-free-model' })
 const grp = (r2) => r2.json.providers.find((p) => p.id === 'our-free-model')
 let gp = grp(g)
 check('关组后组员全部标为关闭', gp.models.every((m) => m.disabled === true), gp.models.map((m) => [m.id, m.disabled]))
 check('关组后组开关为关', gp.groupOn === false && gp.disabled === true, { on: gp.groupOn, off: gp.disabled })
 check('关组后 offCount = 模型数', gp.offCount === 2, gp.offCount)
 
-g = await call('POST', '/api/dsh-model-manager/toggle', { provider: 'our-free-model', model: 'x' })
+g = await call('POST', '/api/dsh-model-switchboard/toggle', { provider: 'our-free-model', model: 'x' })
 gp = grp(g)
 check('开启单个组员后它为开', gp.models.find((m) => m.id === 'x').disabled === false, gp.models.map((m) => [m.id, m.disabled]))
 check('同组其余组员保持关闭', gp.models.find((m) => m.id === 'openrouter/free').disabled === true)
@@ -274,7 +272,7 @@ check('组标记为部分显示', gp.partial === true, gp.partial)
 const runtimeOfm = await llm2.listModels('our-free-model')
 check('运行时目录只剩被开启的那个', runtimeOfm.map((m) => m.id).join(',') === 'x', runtimeOfm.map((m) => m.id))
 
-g = await call('POST', '/api/dsh-model-manager/toggle', { provider: 'our-free-model' })
+g = await call('POST', '/api/dsh-model-switchboard/toggle', { provider: 'our-free-model' })
 gp = grp(g)
 check('部分态点击组开关 → 全部开启', gp.models.every((m) => m.disabled === false), gp.models.map((m) => [m.id, m.disabled]))
 check('partial 标记清除', gp.partial === false, gp.partial)

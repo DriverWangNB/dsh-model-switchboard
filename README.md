@@ -1,4 +1,4 @@
-# dsh-model-manager
+# dsh-model-switchboard
 
 DSH（DeepSeek Harness）的**模型开关**：在设置页多出一个「模型开关」分区，把 DSH 里所有 provider 和模型摊开，逐个或整组关掉，关掉的模型会从所有模型选择器里消失。
 
@@ -15,11 +15,17 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 
 ## 安装
 
-在 DSH profile 的 `package.json` 里加依赖：
+在 DSH profile 的 `package.json` 里加依赖，三种源任选其一：
 
 ```json
 "dependencies": {
-  "dsh-model-manager": "git+https://github.com/DriverWangNB/dsh-model-manager.git"
+  "dsh-model-switchboard": "^0.1.0"
+}
+```
+
+```json
+"dependencies": {
+  "dsh-model-switchboard": "github:DriverWangNB/dsh-model-manager"
 }
 ```
 
@@ -27,11 +33,11 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 
 ```json
 "dependencies": {
-  "dsh-model-manager": "git+https://gitee.com/link77/dsh-models-manager.git"
+  "dsh-model-switchboard": "git+https://gitee.com/link77/dsh-models-manager.git"
 }
 ```
 
-依赖的**键**必须是包名 `dsh-model-manager`；仓库叫什么名字不影响，pnpm 认的是仓库里 `package.json` 的 `name`。
+依赖的**键**必须是包名 `dsh-model-switchboard`；仓库叫什么名字不影响（仓库仍是 `dsh-model-manager`），pnpm 认的是仓库里 `package.json` 的 `name`。
 
 再把包名登记进 `dsh.profile.bundles`：
 
@@ -39,7 +45,7 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 "dsh": {
   "profile": {
     "bundles": [
-      "dsh-model-manager"
+      "dsh-model-switchboard"
     ]
   }
 }
@@ -60,7 +66,9 @@ DSH 内置的「Models」设置页只覆盖**在配置里声明过**的 provider
 
 provider 开关有三种状态：**显示中**（蓝）、**部分显示**（橙，组里有模型被单独关掉）、**已关闭**。
 
-开关状态存在 `~/.dsh/dsh-model-manager/disabled.json`，重启后保留。
+开关状态存在 `~/.dsh/dsh-model-switchboard/disabled.json`，重启后保留。
+
+> 从旧包名 `dsh-model-manager`（≤0.3.3）升级：状态目录一起改了名，旧的 `~/.dsh/dsh-model-manager/disabled.json` 不会被读取。想保留原来的关闭项，把那个文件复制到新目录即可；不复制就是全部重新打开。
 
 ## 工具
 
@@ -73,10 +81,10 @@ provider 开关有三种状态：**显示中**（蓝）、**部分显示**（橙
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/api/dsh-model-manager/state` | 当前开关状态与展示数据 |
-| POST | `/api/dsh-model-manager/toggle` | 切换单个模型或整组 |
-| POST | `/api/dsh-model-manager/bulk` | 批量切换 |
-| POST | `/api/dsh-model-manager/reset` | 清空所有关闭项 |
+| GET | `/api/dsh-model-switchboard/state` | 当前开关状态与展示数据 |
+| POST | `/api/dsh-model-switchboard/toggle` | 切换单个模型或整组 |
+| POST | `/api/dsh-model-switchboard/bulk` | 批量切换 |
+| POST | `/api/dsh-model-switchboard/reset` | 清空所有关闭项 |
 
 ## 工作原理
 

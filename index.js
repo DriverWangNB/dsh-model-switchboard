@@ -1,5 +1,5 @@
 /**
- * dsh-model-manager — 统一管理 DSH 里所有模型：查看、开关。
+ * dsh-model-switchboard — 统一管理 DSH 里所有模型：查看、开关。
  *
  * 两个半身：
  *   Host（本文件）——汇总各 provider 的模型目录，并按用户开关过滤；
@@ -25,17 +25,17 @@ import path from 'node:path'
 import { homedir } from 'node:os'
 import { createRequire } from 'node:module'
 
-export const name = 'dsh-model-manager'
+export const name = 'dsh-model-switchboard'
 export const inject = ['tools', 'llm', 'webServer']
 
 const CONFIG_FILE = 'cordis.yml'
 const PROVIDER_PLUGIN = '@deepseek-ai/dsh-llm-pi-ai'
-const API_PREFIX = '/api/dsh-model-manager'
+const API_PREFIX = '/api/dsh-model-switchboard'
 
 /** 包装标记：每个 registration 只包装一次。 */
-const WRAPPED = Symbol.for('dsh-model-manager.wrapped')
+const WRAPPED = Symbol.for('dsh-model-switchboard.wrapped')
 /** 从包装后的 adapter 取回原 adapter（面板要显示被关闭的条目，须读未过滤目录）。 */
-const RAW_ADAPTER = Symbol.for('dsh-model-manager.raw')
+const RAW_ADAPTER = Symbol.for('dsh-model-switchboard.raw')
 
 /* ────────────────────────────── 路径与状态 ────────────────────────────── */
 
@@ -84,7 +84,7 @@ function profileDir(ctx) {
 
 /** 开关状态文件：整组关闭的 provider + 单独关闭的模型。 */
 function stateFile() {
-  return path.join(dshHome(), 'dsh-model-manager', 'disabled.json')
+  return path.join(dshHome(), 'dsh-model-switchboard', 'disabled.json')
 }
 
 function emptyState() {
@@ -490,12 +490,12 @@ function broadcastTopology(ctx) {
       return
     }
   } catch (error) {
-    ctx.logger?.warn?.(`[dsh-model-manager] emitAdaptersUpdated 调用失败：${error?.message ?? error}`)
+    ctx.logger?.warn?.(`[dsh-model-switchboard] emitAdaptersUpdated 调用失败：${error?.message ?? error}`)
   }
   try {
     ctx.emit('llm/adapters-updated')
   } catch (error) {
-    ctx.logger?.warn?.(`[dsh-model-manager] 广播 llm/adapters-updated 失败：${error?.message ?? error}`)
+    ctx.logger?.warn?.(`[dsh-model-switchboard] 广播 llm/adapters-updated 失败：${error?.message ?? error}`)
   }
 }
 
@@ -550,7 +550,7 @@ function registerApi(ctx, getState, setState) {
       }
     }
   } catch (error) {
-    ctx.logger?.warn?.(`[dsh-model-manager] API 注册失败：${error?.message ?? error}`)
+    ctx.logger?.warn?.(`[dsh-model-switchboard] API 注册失败：${error?.message ?? error}`)
     return () => {}
   }
 }
@@ -666,7 +666,7 @@ export function apply(ctx) {
 
   register({
     name: 'dmm_probe',
-    description: '探针：确认 dsh-model-manager 是否被加载，并回传它看到的服务状态与过滤安装情况。',
+    description: '探针：确认 dsh-model-switchboard 是否被加载，并回传它看到的服务状态与过滤安装情况。',
     parameters: { type: 'object', properties: {}, additionalProperties: false },
     output: {
       schema: { type: 'object' },

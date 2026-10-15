@@ -1,16 +1,16 @@
 /**
- * dsh-model-manager — 浏览器半身。
+ * dsh-model-switchboard — 浏览器半身。
  *
- * 一个设置页分区（settings.section，id `dsh-model-manager`）：把 DSH 里所有
+ * 一个设置页分区（settings.section，id `dsh-model-switchboard`）：把 DSH 里所有
  * provider 的全部模型列出来，支持逐模型开关与整组开关。关闭后的模型会从
  * 所有模型选择器中消失（过滤装在 Host 的 adapter 层）。
  *
  * 手写 ModuleLoader bundle：无构建步骤，除 shell 已提供的 `react` 外无依赖。
- * 数据走插件自己的同源 /api/dsh-model-manager/* 路由（Host 半身注册），
+ * 数据走插件自己的同源 /api/dsh-model-switchboard/* 路由（Host 半身注册），
  * 因为它由同一个宿主进程提供。全部颜色取自主题变量，跟随亮/暗主题。
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-model-manager',
+  id: 'dsh-model-switchboard',
   factory: (require) => {
     const React = require('react')
     const { createElement: h, useState, useEffect, useMemo, useCallback } = React
@@ -19,7 +19,7 @@ window.__ModuleLoader__.load({
     var exports = module.exports
 
     const NS = 'settings.modelManager'
-    const API = '/api/dsh-model-manager'
+    const API = '/api/dsh-model-switchboard'
     const inject = ['slots', 'locale']
 
     const DICT = {
@@ -505,12 +505,12 @@ window.__ModuleLoader__.load({
 
     function apply(ctx) {
       const t = ctx.locale.bind(NS)
-      ctx.effect(() => ctx.locale.register(NS, { zh: DICT.zh, en: DICT.en }), 'dsh-model-manager: dictionaries')
+      ctx.effect(() => ctx.locale.register(NS, { zh: DICT.zh, en: DICT.en }), 'dsh-model-switchboard: dictionaries')
       ctx.slots.inject('settings.section', () =>
         ctx.slots.register(
           {
             name: 'settings.section',
-            id: 'dsh-model-manager',
+            id: 'dsh-model-switchboard',
             order: 80,
             label: () => t('nav'),
             locale: NS,
@@ -522,7 +522,7 @@ window.__ModuleLoader__.load({
 
     exports.apply = apply
     exports.inject = inject
-    exports.name = 'dsh-model-manager'
+    exports.name = 'dsh-model-switchboard'
     return module.exports
   },
 })
